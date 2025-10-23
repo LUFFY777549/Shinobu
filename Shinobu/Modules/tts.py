@@ -1,6 +1,5 @@
-# tts.py
+# tts.py (Pyrogram 2.x compatible)
 from pyrogram import filters
-from pyrogram.types import InputFile
 from Shinobu import bot
 from gtts import gTTS
 from io import BytesIO
@@ -18,11 +17,9 @@ async def tts_convert(client, message):
     tts.write_to_fp(audio_file)
     audio_file.seek(0)
 
-    # Wrap BytesIO in InputFile with filename
-    input_audio = InputFile(audio_file, filename="tts.mp3")
-
-    # Send audio
+    # Pyrogram 2.x compatible: file_name argument
     await message.reply_audio(
-        input_audio,
+        audio_file,
+        file_name="tts.mp3",
         caption=f"TTS for: {text[:50]}..."
     )
