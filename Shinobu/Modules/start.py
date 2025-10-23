@@ -47,7 +47,7 @@ async def start_private(client, message):
     await client.send_photo(message.chat.id, START_IMAGE, caption=caption, reply_markup=buttons)
 
 
-@bot.on_message(filters.command("start") & filters.chat_type.groups)
+@bot.on_message(filters.command("start") & filters.group)
 async def start_group(client, message):
     await Groups.update_one(
         {"group_id": message.chat.id},
