@@ -5,4 +5,5 @@ mongo_client = AsyncIOMotorClient(MONGO_URI)
 DB = mongo_client["Shinobu"]
 #All Database
 Users = DB["USERS"]
+Groups = DB["GROUPS"]
 Banned = []
