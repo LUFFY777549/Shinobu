@@ -6,7 +6,6 @@ from io import BytesIO
 
 @bot.on_message(filters.command("tts") & (filters.private | filters.group))
 async def tts_convert(client, message):
-    # User ka text
     if len(message.command) < 2:
         return await message.reply_text("❌ Usage: /tts <text>")
     
@@ -19,4 +18,8 @@ async def tts_convert(client, message):
     audio_file.seek(0)
 
     # Send audio file
-    await message.reply_audio(audio_file, file_name="tts.mp3", caption=f"TTS for: {text[:50]}...")
+    await message.reply_audio(
+        audio_file,  # file object
+        caption=f"TTS for: {text[:50]}...",
+        title="tts.mp3"
+    )
