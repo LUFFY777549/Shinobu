@@ -4,8 +4,6 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from Shinobu import bot
 from Shinobu.db import Users, Groups
 
-group_filter = filters.chat_type.groups
-
 START_IMAGE = "https://files.catbox.moe/xa33dy.jpg"
 START_TIME = datetime.utcnow()
 
@@ -45,7 +43,6 @@ async def start_private(client, message):
     ])
 
     await client.send_photo(message.chat.id, START_IMAGE, caption=caption, reply_markup=buttons)
-
 
 @bot.on_message(filters.command("start") & filters.group)
 async def start_group(client, message):
