@@ -7,7 +7,7 @@ async def get_id(client, message):
     user = message.from_user
     chat = message.chat
 
-    msg_id = message.message_id
+    msg_id = message.id
     user_id = user.id
     chat_id = chat.id
 
@@ -20,7 +20,7 @@ async def get_id(client, message):
     # Agar reply hai to replied user ka info bhi add karein
     if message.reply_to_message:
         replied_user = message.reply_to_message.from_user
-        replied_msg_id = message.reply_to_message.message_id
+        replied_msg_id = message.reply_to_message.id
         text += (
             f"\n\nʀᴇᴘʟɪᴇᴅ ᴍᴇssᴀɢᴇ ɪᴅ: {replied_msg_id}\n"
             f"ʀᴇᴘʟɪᴇᴅ ᴜsᴇʀ ɪᴅ: {replied_user.id}"
