@@ -1,14 +1,14 @@
 from datetime import datetime
-from pyrogram import Client, filters
+from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from Shinobu import bot
 from Shinobu.db import Users, Groups
 
-START_IMAGE = "start_image.jpg"
+START_IMAGE = "https://files.catbox.moe/xa33dy.jpg"
 START_TIME = datetime.utcnow()
 
 def get_uptime():
-    now = datetime.utcnow()
-    delta = now - START_TIME
+    delta = datetime.utcnow() - START_TIME
     hours, remainder = divmod(int(delta.total_seconds()), 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours}h:{minutes}m:{seconds}s"
@@ -16,8 +16,6 @@ def get_uptime():
 @bot.on_message(filters.command("start") & filters.private)
 async def start_private(client, message):
     user = message.from_user
-
-    # Save user in private DB
     await Users.update_one(
         {"user_id": user.id},
         {"$set": {"username": user.username, "joined_at": datetime.utcnow()}},
@@ -44,18 +42,14 @@ async def start_private(client, message):
         [InlineKeyboardButton("HELP AND COMMANDS", callback_data="help_cmds")]
     ])
 
-    await client.send_photo(chat_id=message.chat.id, photo=START_IMAGE, caption=caption, reply_markup=buttons)
+    await client.send_photo(message.chat.id, START_IMAGE, caption=caption, reply_markup=buttons)
 
 
 @bot.on_message(filters.command("start") & (filters.group | filters.supergroup))
 async def start_group(client, message):
-    chat_id = message.chat.id
-    # Save group in DB
     await Groups.update_one(
-        {"group_id": chat_id},
+        {"group_id": message.chat.id},
         {"$set": {"group_name": message.chat.title, "joined_at": datetime.utcnow()}},
         upsert=True
     )
-
-    # Send simple start message in group
-    await message.reply_text(f"「sʜɪɴᴏʙᴜ X ᴍᴜsɪᴄ♪」 is now active in this group!")
+    await message.reply_text("「sʜɪɴᴏʙᴜ X ᴍᴜsɪᴄ♪」 is now active in this group!")
