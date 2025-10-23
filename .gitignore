@@ -1,0 +1,54 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+.env.*.local
+*.env
+
+# Database files
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# Docker
+*.dockerignore
+Dockerfile
+docker-compose.yml
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Byte-compiled / optimized / DLL files
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+*.manifest
+*.spec
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Misc
+*.bak
+*.old
+*.orig
