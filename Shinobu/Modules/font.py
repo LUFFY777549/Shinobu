@@ -29,7 +29,7 @@ async def font_buttons(client, message, cb=False):
         await message.edit_reply_markup(InlineKeyboardMarkup(buttons))
 
 # Callback for next page or style selection
-@app.on_callback_query(filters.regex("^style|^nxt"))
+@bot.on_callback_query(filters.regex("^style|^nxt"))
 async def style_callback(client, callback_query):
     data = callback_query.data
     await callback_query.answer()
