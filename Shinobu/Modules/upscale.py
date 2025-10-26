@@ -3,7 +3,7 @@ from io import BytesIO
 from pyrogram import filters
 from pyrogram.types import Message
 from PIL import Image
-from Shinobu import bot  # Your Pyrogram client
+from Shinobu import bot  
 
 # Scale factor
 SCALE = 2  # 2x upscale
@@ -18,6 +18,7 @@ async def upscale_image(client, message: Message):
     if not (replied.photo or replied.document):
         return await message.reply("❌ Please reply to a photo or image document to upscale it.")
 
+    # Send temporary status message
     status_msg = await message.reply("🔄 Upscaling your image locally, please wait...")
 
     try:
@@ -39,6 +40,9 @@ async def upscale_image(client, message: Message):
         # Prepare document name
         doc_name = f"Alpha[{doc_counter}].jpg"
         doc_counter += 1
+
+        # Delete temporary status message
+        await status_msg.delete()
 
         # Send directly as document with caption
         await message.reply_document(buf_doc, file_name=doc_name, caption="✅ ɪᴍᴀɢᴇ ᴜᴘꜱᴄᴀʟᴇᴅ ꜱᴜᴄᴄᴇꜱꜰᴜʟʟʏ")
