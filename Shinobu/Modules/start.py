@@ -24,14 +24,13 @@ async def start_private(client, message):
 
     uptime = get_uptime()
     caption = (
-        f"{user.mention} ❍ ɪs ᴀʟɪᴠᴇ ●\n"
-        f"❍ ᴜᴘᴛɪᴍᴇ : {uptime} ●\n\n"
-        "๏ ᴛʜɪs ɪs 「sʜɪɴᴏʙᴜ X ᴍᴜsɪᴄ♪」!\n"
-        "➻ ᴀ ғᴀsᴛ & ᴘᴏᴡᴇʀғᴜʟ ᴛᴇʟᴇɢʀᴀᴍ ᴍᴜsɪᴄ ᴘʟᴀʏᴇʀ ʙᴏᴛ ᴡɪᴛʜ sᴏᴍᴇ ᴀᴡᴇsᴏᴍᴇ ғᴇᴀᴛᴜʀᴇs.\n\n"
-        "Sᴜᴘᴘᴏʀᴛᴇᴅ Pʟᴀᴛғᴏʀᴍs : ʏᴏᴜᴛᴜʙᴇ, sᴘᴏᴛɪғʏ, ʀᴇssᴏ, ᴀᴘᴘʟᴇ ᴍᴜsɪᴄ ᴀɴᴅ sᴏᴜɴᴅᴄʟᴏᴜᴅ.\n"
-        "──────────────────\n"
-        "๏ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʜᴇʟᴩ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ᴀʙᴏᴜᴛ ᴍʏ ᴍᴏᴅᴜʟᴇs ᴀɴᴅ ᴄᴏᴍᴍᴀɴᴅs."
-    )
+    f"Hey {user.mention}!\n"
+    "๏ ᴛʜɪs ɪs 「sʜɪɴᴏʙᴜ X ᴄʜᴀᴛʙᴏᴛ🦋」!\n"
+    "➻ ᴀ sᴍᴀʀᴛ & ᴘᴏᴡᴇʀғᴜʟ ᴛᴇʟᴇɢʀᴀᴍ ᴄʜᴀᴛʙᴏᴛ ᴡɪᴛʜ ʟᴏᴛs ᴏꜰ ᴜsᴇꜰᴜʟ ꜰᴇᴀᴛᴜʀᴇs.\n\n"
+    "Sᴜᴘᴘᴏʀᴛᴇᴅ Fᴇᴀᴛᴜʀᴇs : ʀᴇᴍɪɴᴅᴇʀs, ɴᴏᴛᴇs, ᴄʜᴀᴛ ᴍᴏᴅᴜʟᴇs, ᴀɴᴅ ᴍᴜᴄʜ ᴍᴏʀᴇ.\n"
+    "──────────────────\n"
+    "๏ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ ʜᴇʟᴩ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ ᴀʙᴏᴜᴛ ᴍʏ ᴄᴏᴍᴍᴀɴᴅs ᴀɴᴅ ᴍᴏᴅᴜʟᴇs."
+)
 
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("ADD ME TO YOUR GROUP", url="https://t.me/YourBot?startgroup=true")],
@@ -51,4 +50,4 @@ async def start_group(client, message):
         {"$set": {"group_name": message.chat.title, "joined_at": datetime.utcnow()}},
         upsert=True
     )
-    await message.reply_text("「sʜɪɴᴏʙᴜ X ᴍᴜsɪᴄ♪」 is now active in this group!")
+    await message.reply_text("「sʜɪɴᴏʙᴜ X ᴄʜᴀᴛʙᴏᴛ🦋」 is now active in this group!")
