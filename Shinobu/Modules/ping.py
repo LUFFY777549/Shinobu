@@ -31,7 +31,7 @@ async def send_ping(client, message):
 
     caption = (
         f"➻ ᴩᴏɴɢ : {ping:.3f}ᴍs\n\n"
-        f"{user_mention} sʏsᴛᴇᴍ sᴛᴀᴛs :\n\n"
+        f"「sʜɪɴᴏʙᴜ X ᴄʜᴀᴛʙᴏᴛ 🦋」 sʏsᴛᴇᴍ sᴛᴀᴛs :\n\n"
         f"๏ ᴜᴩᴛɪᴍᴇ : {uptime}\n"
         f"๏ ʀᴀᴍ : {ram}\n"
         f"๏ ᴄᴩᴜ : {cpu}\n"
