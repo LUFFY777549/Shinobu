@@ -18,7 +18,7 @@ async def upscale_image(client, message: Message):
     if not (replied.photo or replied.document):
         return await message.reply("❌ Please reply to a photo or image document to upscale it.")
 
-    status_msg = await message.reply("🔄 Upscaling your image, please wait...")
+    status_msg = await message.reply("🔄 Upscaling your image locally, please wait...")
 
     try:
         # Download the media
@@ -31,24 +31,17 @@ async def upscale_image(client, message: Message):
         # Upscale using PIL (bicubic)
         upscaled = img.resize(new_size, Image.BICUBIC)
 
-        # Save to buffer for sending as photo
-        buf_photo = BytesIO()
-        upscaled.save(buf_photo, format="JPEG")
-        buf_photo.seek(0)
-
-        # Send upscale result as photo
-        await status_msg.edit_text("✅ ɪᴍᴀɢᴇ ᴜᴘꜱᴄᴀʟᴇᴅ ꜱᴜᴄᴄᴇꜱꜰᴜʟʟʏ")
-        await message.reply_photo(buf_photo, caption=f"Here is your {SCALE}x upscaled image!")
-
         # Save to buffer for sending as document
         buf_doc = BytesIO()
         upscaled.save(buf_doc, format="JPEG")
         buf_doc.seek(0)
 
+        # Prepare document name
         doc_name = f"Alpha[{doc_counter}].jpg"
         doc_counter += 1
 
-        await message.reply_document(buf_doc, file_name=doc_name, caption=f"Document version: {doc_name}")
+        # Send directly as document with caption
+        await message.reply_document(buf_doc, file_name=doc_name, caption="✅ ɪᴍᴀɢᴇ ᴜᴘꜱᴄᴀʟᴇᴅ ꜱᴜᴄᴄᴇꜱꜰᴜʟʟʏ")
 
     except Exception as e:
         await status_msg.edit_text(f"❌ Upscale failed.\nError: `{e}`")
