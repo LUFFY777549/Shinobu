@@ -1,53 +1,56 @@
-from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+# fonts.py
+# Fonts module for Shinobu bot
 
-from Shinobu import app  # Your Pyrogram client
-from Shinobu.modules.fonts import fonts  # import fonts.py
+def typewriter(text: str) -> str:
+    return "".join([f"𝚊"[ord(c.lower()) % 26] if c.isalpha() else c for c in text])
 
-# Command /font or /fonts
-@app.on_message(filters.command(["font", "fonts"]))
-async def font_buttons(client, message, cb=False):
-    buttons = [
-        [
-            InlineKeyboardButton("Typewriter", callback_data="style+typewriter"),
-            InlineKeyboardButton("Outline", callback_data="style+outline"),
-            InlineKeyboardButton("Serif", callback_data="style+serif"),
-        ],
-        [
-            InlineKeyboardButton("Bold", callback_data="style+bold_cool"),
-            InlineKeyboardButton("SmallCaps", callback_data="style+small_cap"),
-        ],
-        [InlineKeyboardButton("Next ➻", callback_data="nxt")],
-    ]
-    if not cb:
-        await message.reply_text(
-            message.text or "Select a font style:",
-            reply_markup=InlineKeyboardMarkup(buttons),
-            quote=True
-        )
-    else:
-        await message.edit_reply_markup(InlineKeyboardMarkup(buttons))
+def outline(text: str) -> str:
+    mapping = { 
+        "a":"Ⓐ","b":"Ⓑ","c":"Ⓒ","d":"Ⓓ","e":"Ⓔ","f":"Ⓕ","g":"Ⓖ","h":"Ⓗ",
+        "i":"Ⓘ","j":"Ⓙ","k":"Ⓚ","l":"Ⓛ","m":"Ⓜ","n":"Ⓝ","o":"Ⓞ","p":"Ⓟ",
+        "q":"Ⓠ","r":"Ⓡ","s":"Ⓢ","t":"Ⓣ","u":"Ⓤ","v":"Ⓥ","w":"Ⓦ","x":"Ⓧ",
+        "y":"Ⓨ","z":"Ⓩ",
+        "A":"Ⓐ","B":"Ⓑ","C":"Ⓒ","D":"Ⓓ","E":"Ⓔ","F":"Ⓕ","G":"Ⓖ","H":"Ⓗ",
+        "I":"Ⓘ","J":"Ⓙ","K":"Ⓚ","L":"Ⓛ","M":"Ⓜ","N":"Ⓝ","O":"Ⓞ","P":"Ⓟ",
+        "Q":"Ⓠ","R":"Ⓡ","S":"Ⓢ","T":"Ⓣ","U":"Ⓤ","V":"Ⓥ","W":"Ⓦ","X":"Ⓧ",
+        "Y":"Ⓨ","Z":"Ⓩ"
+    }
+    return "".join([mapping.get(c, c) for c in text])
 
-# Callback for next page or style selection
-@app.on_callback_query(filters.regex("^style|^nxt"))
-async def style_callback(client, callback_query):
-    data = callback_query.data
-    await callback_query.answer()
-    
-    if data.startswith("style+"):
-        _, style = data.split("+")
-        text = callback_query.message.reply_to_message.text
-        func = getattr(fonts, style, None)
-        if func:
-            new_text = func(text)
-            await callback_query.message.edit_text(new_text, reply_markup=callback_query.message.reply_markup)
-    elif data == "nxt":
-        # example next page buttons
-        buttons = [
-            [InlineKeyboardButton("Comic", callback_data="style+comic"),
-             InlineKeyboardButton("Script", callback_data="style+script")],
-            [InlineKeyboardButton("Back ◀", callback_data="back")]
-        ]
-        await callback_query.message.edit_reply_markup(InlineKeyboardMarkup(buttons))
-    elif data == "back":
-        await font_buttons(client, callback_query, cb=True)
+def serif(text: str) -> str:
+    mapping = {
+        "a":"𝑎","b":"𝑏","c":"𝑐","d":"𝑑","e":"𝑒","f":"𝑓","g":"𝑔","h":"ℎ",
+        "i":"𝑖","j":"𝑗","k":"𝑘","l":"𝑙","m":"𝑚","n":"𝑛","o":"𝑜","p":"𝑝",
+        "q":"𝑞","r":"𝑟","s":"𝑠","t":"𝑡","u":"𝑢","v":"𝑣","w":"𝑤","x":"𝑥",
+        "y":"𝑦","z":"𝑧",
+        "A":"𝐴","B":"𝐵","C":"𝐶","D":"𝐷","E":"𝐸","F":"𝐹","G":"𝐺","H":"𝐻",
+        "I":"𝐼","J":"𝐽","K":"𝐾","L":"𝐿","M":"𝑀","N":"𝑁","O":"𝑂","P":"𝑃",
+        "Q":"𝑄","R":"𝑅","S":"𝑆","T":"𝑇","U":"𝑈","V":"𝑉","W":"𝑊","X":"𝑋",
+        "Y":"𝑌","Z":"𝑍"
+    }
+    return "".join([mapping.get(c, c) for c in text])
+
+def bold_cool(text: str) -> str:
+    mapping = {
+        "a":"𝗮","b":"𝗯","c":"𝗰","d":"𝗱","e":"𝗲","f":"𝗳","g":"𝗴","h":"𝗵",
+        "i":"𝗶","j":"𝗷","k":"𝗸","l":"𝗹","m":"𝗺","n":"𝗻","o":"𝗼","p":"𝗽",
+        "q":"𝗾","r":"𝗿","s":"𝘀","t":"𝘁","u":"𝘂","v":"𝘃","w":"𝘄","x":"𝘅",
+        "y":"𝘆","z":"𝘇",
+        "A":"𝗔","B":"𝗕","C":"𝗖","D":"𝗗","E":"𝗘","F":"𝗙","G":"𝗚","H":"𝗛",
+        "I":"𝗜","J":"𝗝","K":"𝗞","L":"𝗟","M":"𝗠","N":"𝗡","O":"𝗢","P":"𝗣",
+        "Q":"𝗤","R":"𝗥","S":"𝗦","T":"𝗧","U":"𝗨","V":"𝗩","W":"𝗪","X":"𝗫",
+        "Y":"𝗬","Z":"𝗭"
+    }
+    return "".join([mapping.get(c, c) for c in text])
+
+def small_cap(text: str) -> str:
+    mapping = {
+        "a":"ᴀ","b":"ʙ","c":"ᴄ","d":"ᴅ","e":"ᴇ","f":"ꜰ","g":"ɢ","h":"ʜ",
+        "i":"ɪ","j":"ᴊ","k":"ᴋ","l":"ʟ","m":"ᴍ","n":"ɴ","o":"ᴏ","p":"ᴘ",
+        "q":"ǫ","r":"ʀ","s":"s","t":"ᴛ","u":"ᴜ","v":"ᴠ","w":"ᴡ","x":"x",
+        "y":"ʏ","z":"ᴢ"
+    }
+    return "".join([mapping.get(c, c) for c in text])
+
+# Aap aur fonts similarly add kar sakte ho
+# Example: comic, script, gothic, etc.
