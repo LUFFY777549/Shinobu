@@ -5,7 +5,7 @@ from pyrogram import filters
 from pyrogram.types import Message
 from Shinobu import bot  # Your Pyrogram client
 
-DEEPAI_API_URL = "https://api.deepai.org/api/torch-srgan"
+DEEPAI_API_URL = "485e1e55-860c-4f13-9a31-7fc0f85b3b4c"
 DEEPAI_API_KEY = "YOUR_DEEPAI_API_KEY"  # Get from https://deepai.org/
 
 @bot.on_message(filters.command("up") & filters.reply & (filters.private | filters.group))
