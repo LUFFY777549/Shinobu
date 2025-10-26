@@ -32,7 +32,7 @@ async def upscale_image(client, message: Message):
         buf.seek(0)
 
         # Send upscaled image
-        await status_msg.edit_text("✅ Image upscaled successfully!")
+        await status_msg.edit_text("✅ ɪᴍᴀɢᴇ ᴜᴘꜱᴄᴀʟᴇᴅ ꜱᴜᴄᴄᴇꜱꜰᴜʟʟʏ")
         await message.reply_photo(buf, caption=f"Here is your {SCALE}x upscaled image!")
 
     except Exception as e:
