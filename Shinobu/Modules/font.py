@@ -1,11 +1,11 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from shinobu import app  # Your Pyrogram client
+from shinobu import bot  # Your Pyrogram client
 from shinobu.fonts import fonts  # import fonts.py
 
 # Command /font or /fonts
-@app.on_message(filters.command(["font", "fonts"]))
+@bot.on_message(filters.command(["font", "fonts"]))
 async def font_buttons(client, message, cb=False):
     buttons = [
         [
