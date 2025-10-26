@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from Shinobu import bot  # Your Pyrogram client
 
 CATBOX_UPLOAD_URL = "https://catbox.moe/user/api.php"
-CATBOX_API_KEY = "YOUR_CATBOX_API_KEY"  # Optional, lekin faster uploads ke liye
+CATBOX_API_KEY = "29e6d170c9cb35294d0d177d6"  # Optional, lekin faster uploads ke liye
 
 @bot.on_message(filters.command("tgm") & filters.reply & (filters.private | filters.group))
 async def tgm_upload(client, message: Message):
