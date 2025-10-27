@@ -1,31 +1,38 @@
 # Shinobu/utils/admin.py
+import asyncio
 from pyrogram.errors import FloodWait, RPCError
 
-# ---------------- Check if user is admin ---------------- #
+# -------- Get member info safely -------- #
+async def get_member_status(client, chat_id: int, user_id: int):
+    try:
+        member = await client.get_chat_member(chat_id, user_id)
+        return member.status.lower()
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        return await get_member_status(client, chat_id, user_id)
+    except Exception:
+        return None
+
+
+# -------- Check if admin -------- #
 async def is_admin(client, chat_id: int, user_id: int) -> bool:
-    try:
-        member = await client.get_chat_member(chat_id, user_id)
-        return member.status in ["administrator", "creator"]
-    except Exception:
-        return False
+    status = await get_member_status(client, chat_id, user_id)
+    return status in ["administrator", "creator", "owner"]
 
-# ---------------- Check if user is owner ---------------- #
+
+# -------- Check if owner -------- #
 async def is_owner(client, chat_id: int, user_id: int) -> bool:
-    try:
-        member = await client.get_chat_member(chat_id, user_id)
-        return member.status == "creator"
-    except Exception:
-        return False
+    status = await get_member_status(client, chat_id, user_id)
+    return status in ["creator", "owner"]
 
-# ---------------- Check if user is member (non-admin) ---------------- #
+
+# -------- Check if normal member -------- #
 async def is_member(client, chat_id: int, user_id: int) -> bool:
-    try:
-        member = await client.get_chat_member(chat_id, user_id)
-        return member.status == "member"
-    except Exception:
-        return False
+    status = await get_member_status(client, chat_id, user_id)
+    return status == "member"
 
-# ---------------- Get all admins list ---------------- #
+
+# -------- Get all admins list -------- #
 async def get_admins(client, chat_id: int):
     admins = []
     try:
