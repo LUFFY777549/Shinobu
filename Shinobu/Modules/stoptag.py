@@ -4,7 +4,7 @@ import logging
 from pyrogram import filters
 from Shinobu import bot
 from Shinobu.db import stop_tag, is_tagging_active
-from Shinobu.utils import is_user_admin
+from Shinobu.utils.admin import is_user_admin
 
 logger = logging.getLogger(__name__)
 
