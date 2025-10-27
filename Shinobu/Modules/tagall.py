@@ -1,96 +1,134 @@
 # Shinobu/Modules/tagall.py
-from pyrogram import filters
-from pyrogram.types import Message
-from Shinobu import bot
-from Shinobu.utils.admin import is_admin
 import asyncio
+import random
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.enums import ParseMode
+from Shinobu import bot
+from Shinobu.utils.admin import is_user_admin
+from Shinobu.db.tagging import start_tag, stop_tag, is_tagging_active
 
-# Active tagging chats list
-spam_chats = set()
+# -------------------- EMOJIS -------------------- #
+EMOJIS = ["🦁", "🐯", "🐱", "🐶", "🐺", "🐻", "🐼", "🐹", "🐭", "🐰", "🦊", "🐮", "🐷"]
+
+# Temporary storage for tag text
+TAG_TEXT = {}
 
 
-# ---------------- TAG ALL ---------------- #
-@bot.on_message(filters.command(["tagall", "all"], prefixes=["/", ".", "!"]) & filters.group)
-async def tag_all(client, message: Message):
+# -------------------- TAGALL COMMAND -------------------- #
+@bot.on_message(filters.command("tagall") & filters.group)
+async def tagall(client, message):
     chat_id = message.chat.id
-    user = message.from_user
+    user_id = message.from_user.id
 
-    # Only admins
-    if not await is_admin(client, chat_id, user.id):
-        return await message.reply_text("❌ Only admins can mention all!")
+    # ✅ Admin check
+    if not await is_admin(client, chat_id, user_id):
+        return await message.reply_text("❌ Only admins can use this command!")
 
-    # Get custom text or replied message
-    if len(message.command) > 1 and message.reply_to_message:
-        return await message.reply_text("❌ Give only one argument (text OR reply), not both!")
-    elif len(message.command) > 1:
-        mode = "text_on_cmd"
-        msg = " ".join(message.command[1:])
-    elif message.reply_to_message:
-        mode = "text_on_reply"
-        msg = message.reply_to_message
+    # ✅ If reply → use that text
+    if message.reply_to_message:
+        tag_text = message.reply_to_message.text or ""
+        reply_to_id = message.reply_to_message.id
     else:
-        return await message.reply_text("⚠️ Reply to a message or add text to mention all users!")
+        tag_text = " ".join(message.command[1:]) or ""
+        reply_to_id = None
 
-    # Add to spam list
-    spam_chats.add(chat_id)
-    await message.reply_text("🔁 Starting mass mention... use /cancel to stop.")
+    TAG_TEXT[chat_id] = {"text": tag_text, "reply_id": reply_to_id}
 
-    user_count = 0
-    mention_text = ""
+    markup = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("✅ Send", callback_data="send_tag"),
+                InlineKeyboardButton("❌ Cancel", callback_data="cancel_tag"),
+            ]
+        ]
+    )
 
-    async for member in client.get_chat_members(chat_id):
-        if chat_id not in spam_chats:
-            break
-        if member.user.is_bot:
-            continue
+    preview = " ".join(random.choices(EMOJIS, k=10))
+    await message.reply_text(
+        f"{tag_text}\n\n<b>Preview:</b>\n{preview}",
+        reply_markup=markup,
+        reply_to_message_id=reply_to_id if reply_to_id else None,
+        parse_mode=ParseMode.HTML,
+    )
 
-        user_count += 1
-        mention_text += f"[{member.user.first_name}](tg://user?id={member.user.id}), "
 
-        if user_count % 5 == 0:
+# -------------------- BUTTON HANDLER -------------------- #
+@bot.on_callback_query(filters.regex("^(send_tag|cancel_tag)$"))
+async def handle_buttons(client, cq):
+    chat_id = cq.message.chat.id
+    user_id = cq.from_user.id
+    data = cq.data
+
+    # Cancel button
+    if data == "cancel_tag":
+        return await cq.edit_message_text("❌ Tagging cancelled.")
+
+    # Send button
+    if data == "send_tag":
+        await cq.edit_message_text("🚀 Tagging started...")
+        await start_tag(chat_id, user_id)
+
+        # Counters
+        success_count, bot_count, deleted_count, fail_count = 0, 0, 0, 0
+        members = []
+
+        # Collect members
+        async for m in client.get_chat_members(chat_id):
+            if m.user.is_bot:
+                bot_count += 1
+                continue
+            if m.user.is_deleted:
+                deleted_count += 1
+                continue
+            members.append(m.user)
+
+        if not members:
+            await stop_tag(chat_id)
+            return await cq.edit_message_text("⚠️ No valid members found!")
+
+        # Get saved text and reply target
+        tag_info = TAG_TEXT.get(chat_id, {"text": "", "reply_id": None})
+        text = tag_info["text"]
+        reply_to_id = tag_info["reply_id"]
+
+        chunk_size = 10
+        for i in range(0, len(members), chunk_size):
+            if not await is_tagging_active(chat_id):
+                await client.send_message(chat_id, "🛑 Tagging stopped manually.")
+                return
+
+            chunk = members[i : i + chunk_size]
+            mentions = " ".join(
+                [f"[{random.choice(EMOJIS)}](tg://user?id={m.id})" for m in chunk]
+            )
+
+            msg = f"{text}\n\n{mentions}" if text else mentions
+
             try:
-                if mode == "text_on_cmd":
-                    text = f"{msg}\n\n{mention_text}"
-                    await client.send_message(chat_id, text)
-                else:
-                    await msg.reply_text(mention_text)
+                await client.send_message(
+                    chat_id,
+                    msg.strip(),
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_to_message_id=reply_to_id if reply_to_id else None,
+                )
+                success_count += len(chunk)
             except Exception:
-                pass
-            await asyncio.sleep(2)
-            mention_text = ""
+                fail_count += len(chunk)
 
-    # Send leftover mentions
-    if mention_text:
-        try:
-            if mode == "text_on_cmd":
-                await client.send_message(chat_id, f"{msg}\n\n{mention_text}")
-            else:
-                await msg.reply_text(mention_text)
-        except Exception:
-            pass
+            await asyncio.sleep(3)
 
-    try:
-        spam_chats.remove(chat_id)
-    except:
-        pass
-
-    await message.reply_text("✅ Done tagging all members!")
-
-
-# ---------------- CANCEL TAGGING ---------------- #
-@bot.on_message(filters.command("cancel") & filters.group)
-async def cancel_tagging(client, message: Message):
-    chat_id = message.chat.id
-    user = message.from_user
-
-    if chat_id not in spam_chats:
-        return await message.reply_text("❌ No tagging process is running!")
-
-    if not await is_admin(client, chat_id, user.id):
-        return await message.reply_text("❌ Only admins can cancel tagging!")
-
-    try:
-        spam_chats.remove(chat_id)
-    except:
-        pass
-    await message.reply_text("🛑 Tagging stopped successfully!")
+        await stop_tag(chat_id)
+        await client.send_message(
+            chat_id,
+            (
+                f"✅ Tagging completed!\n\n"
+                f"👤 Successful: `{success_count}`\n"
+                f"🤖 Bots skipped: `{bot_count}`\n"
+                f"🗑 Deleted accounts: `{deleted_count}`\n"
+                f"⚠️ Failed: `{fail_count}`\n\n"
+                f"💬 Started by: [{cq.from_user.first_name}](tg://user?id={user_id})"
+            ),
+            parse_mode=ParseMode.MARKDOWN,
+            reply_to_message_id=reply_to_id if reply_to_id else None,
+        )
