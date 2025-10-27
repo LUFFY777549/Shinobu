@@ -5,43 +5,92 @@ from Shinobu import bot
 from Shinobu.utils.admin import is_admin
 import asyncio
 
+# Active tagging chats list
+spam_chats = set()
+
+
+# ---------------- TAG ALL ---------------- #
 @bot.on_message(filters.command(["tagall", "all"], prefixes=["/", ".", "!"]) & filters.group)
 async def tag_all(client, message: Message):
-    chat = message.chat
+    chat_id = message.chat.id
     user = message.from_user
 
-    # ✅ Check if user is admin using our fixed utils
-    if not await is_admin(client, chat.id, user.id):
-        return await message.reply_text("❌ You must be an admin to use this command!")
+    # Only admins
+    if not await is_admin(client, chat_id, user.id):
+        return await message.reply_text("❌ Only admins can mention all!")
 
-    # Custom message
-    text = message.text.split(maxsplit=1)
-    custom_msg = text[1] if len(text) > 1 else "⚡ Attention everyone!"
+    # Get custom text or replied message
+    if len(message.command) > 1 and message.reply_to_message:
+        return await message.reply_text("❌ Give only one argument (text OR reply), not both!")
+    elif len(message.command) > 1:
+        mode = "text_on_cmd"
+        msg = " ".join(message.command[1:])
+    elif message.reply_to_message:
+        mode = "text_on_reply"
+        msg = message.reply_to_message
+    else:
+        return await message.reply_text("⚠️ Reply to a message or add text to mention all users!")
 
-    status_msg = await message.reply_text("🔁 Tagging all members, please wait...")
+    # Add to spam list
+    spam_chats.add(chat_id)
+    await message.reply_text("🔁 Starting mass mention... use /cancel to stop.")
 
-    members = client.get_chat_members(chat.id)
-    batch = []
-    count = 0
+    user_count = 0
+    mention_text = ""
 
-    async for m in members:
-        if m.user.is_bot:
+    async for member in client.get_chat_members(chat_id):
+        if chat_id not in spam_chats:
+            break
+        if member.user.is_bot:
             continue
-        mention = m.user.mention
-        batch.append(mention)
-        count += 1
 
-        if len(batch) == 5:
-            msg = f"{custom_msg}\n\n" + " ".join(batch)
+        user_count += 1
+        mention_text += f"[{member.user.first_name}](tg://user?id={member.user.id}), "
+
+        if user_count % 5 == 0:
             try:
-                await client.send_message(chat.id, msg)
+                if mode == "text_on_cmd":
+                    text = f"{msg}\n\n{mention_text}"
+                    await client.send_message(chat_id, text)
+                else:
+                    await msg.reply_text(mention_text)
             except Exception:
                 pass
             await asyncio.sleep(2)
-            batch.clear()
+            mention_text = ""
 
-    if batch:
-        msg = f"{custom_msg}\n\n" + " ".join(batch)
-        await client.send_message(chat.id, msg)
+    # Send leftover mentions
+    if mention_text:
+        try:
+            if mode == "text_on_cmd":
+                await client.send_message(chat_id, f"{msg}\n\n{mention_text}")
+            else:
+                await msg.reply_text(mention_text)
+        except Exception:
+            pass
 
-    await status_msg.edit_text(f"✅ Successfully tagged {count} members!")
+    try:
+        spam_chats.remove(chat_id)
+    except:
+        pass
+
+    await message.reply_text("✅ Done tagging all members!")
+
+
+# ---------------- CANCEL TAGGING ---------------- #
+@bot.on_message(filters.command("cancel") & filters.group)
+async def cancel_tagging(client, message: Message):
+    chat_id = message.chat.id
+    user = message.from_user
+
+    if chat_id not in spam_chats:
+        return await message.reply_text("❌ No tagging process is running!")
+
+    if not await is_admin(client, chat_id, user.id):
+        return await message.reply_text("❌ Only admins can cancel tagging!")
+
+    try:
+        spam_chats.remove(chat_id)
+    except:
+        pass
+    await message.reply_text("🛑 Tagging stopped successfully!")
