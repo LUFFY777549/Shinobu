@@ -6,7 +6,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.enums import ParseMode
 from Shinobu import bot
 from Shinobu.utils.admin import is_user_admin
-from Shinobu.db.tagging import start_tag, stop_tag, is_tagging_active
+from Shinobu.db import start_tag, stop_tag, is_tagging_active
 
 # -------------------- EMOJIS -------------------- #
 EMOJIS = ["🦁", "🐯", "🐱", "🐶", "🐺", "🐻", "🐼", "🐹", "🐭", "🐰", "🦊", "🐮", "🐷"]
