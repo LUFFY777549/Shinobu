@@ -5,17 +5,16 @@ from Shinobu import bot
 from Shinobu.utils.admin import is_admin
 import asyncio
 
-# ---------------- TagAll Command ---------------- #
 @bot.on_message(filters.command(["tagall", "all"], prefixes=["/", ".", "!"]) & filters.group)
 async def tag_all(client, message: Message):
     chat = message.chat
     user = message.from_user
 
-    # Admin Check using utils
+    # ✅ Check if user is admin using our fixed utils
     if not await is_admin(client, chat.id, user.id):
         return await message.reply_text("❌ You must be an admin to use this command!")
 
-    # Optional custom message
+    # Custom message
     text = message.text.split(maxsplit=1)
     custom_msg = text[1] if len(text) > 1 else "⚡ Attention everyone!"
 
@@ -32,7 +31,6 @@ async def tag_all(client, message: Message):
         batch.append(mention)
         count += 1
 
-        # Send in batches of 5 mentions
         if len(batch) == 5:
             msg = f"{custom_msg}\n\n" + " ".join(batch)
             try:
@@ -42,7 +40,6 @@ async def tag_all(client, message: Message):
             await asyncio.sleep(2)
             batch.clear()
 
-    # Remaining mentions
     if batch:
         msg = f"{custom_msg}\n\n" + " ".join(batch)
         await client.send_message(chat.id, msg)
