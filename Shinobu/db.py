@@ -4,7 +4,7 @@ MONGO_URI = "mongodb+srv://sufyan532011:5042@auctionbot.5ms20.mongodb.net/?retry
 mongo_client = AsyncIOMotorClient(MONGO_URI)
 DB = mongo_client["Shinobu"]
 #All Database
-tag_collection = db["active_tags"]
+tag_collection = DB["active_tags"]
 Users = DB["USERS"]
 Groups = DB["GROUPS"]
 Banned = []
