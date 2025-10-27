@@ -22,7 +22,7 @@ async def tagall(client, message):
     user_id = message.from_user.id
 
     # ✅ Admin check
-    if not await is_admin(client, chat_id, user_id):
+    if not await is_user_admin(client, chat_id, user_id):
         return await message.reply_text("❌ Only admins can use this command!")
 
     # ✅ If reply → use that text
